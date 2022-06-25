@@ -1,5 +1,5 @@
 const numOfCards = 52;
-const numOfCardsToDeal = 6;
+const defaultNumOfCards = 6;
 const cardsInRow = 13;
 const aceScore = 12;
 const cardWidth = 135;
@@ -39,8 +39,23 @@ const shuffleDeck = (deck) => {
 //     console.log('------------');
 // }
 
-const dealCards = (deck) => {
+const useDeck = (numOfCardsToDeal, deck) => {
     const cardsToDeal = deck.splice(deck.length - numOfCardsToDeal, numOfCardsToDeal);
+    return cardsToDeal;
+}
+
+const dealCards = useDeck.bind(null, defaultNumOfCards);
+
+const takeFromDeck = (numOfCardsOnHand, deck) => {
+    if (numOfCardsOnHand >= defaultNumOfCards) return [];
+    
+    let numOfCardsToDeal = defaultNumOfCards - numOfCardsOnHand;
+    const numberOfCardsInDeck = deck.length;
+
+    if (numOfCardsToDeal > numberOfCardsInDeck) {
+        numOfCardsToDeal = numberOfCardsInDeck;
+    }
+    const cardsToDeal = useDeck(numOfCardsToDeal, deck);
     return cardsToDeal;
 }
 
@@ -119,4 +134,4 @@ const checkAttackMove = (card, cardsInPlay) => {
 }
 
 export { createDeck, shuffleDeck, dealCards, getSuit, findPosition, cardWidth, cardHeight,
-    findX, getScore, checkDefendMove, checkAttackMove }
+    findX, getScore, checkDefendMove, checkAttackMove, takeFromDeck }

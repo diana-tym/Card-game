@@ -76,3 +76,19 @@ canvas {
     height: 400px;
     position: relative;
 }
+
+#cards button {
+    position: absolute;
+    right: 100px;
+    width: 100px;
+    height: 40px;
+    font-size: large;
+}
+
+#button-take {
+    top: 400px;
+}
+
+#button-discard {
+    top: 450px;
+}

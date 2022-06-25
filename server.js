@@ -125,6 +125,11 @@ const startGame = (room) => {
         return this.inPlay[idx];
     }
 
+    room.skipMove = function() {
+        this.turn = this.getNextTurn();
+        return this.getNextTurn();
+    }
+
     const payLoad = {
         event: 'startGame',
         turn: room.turn,
@@ -265,7 +270,44 @@ const makeMove = (data) => {
     }
 }
 
-const handlers = {'createRoom': createRoom, 'joinRoom': joinRoom, 'makeMove': makeMove};
+const clickTake = (data) => {
+    const room = rooms[data.roomId];
+    const client = clients[data.clientId];
+    const cardsToTake = room.cardsInPlay;
+
+    client.cardsOnHand.push(...cardsToTake);
+    room.cardsInPlay = [];
+
+    const cardsOnHand = clients[room.turn].cardsOnHand;
+    const cardsToDeal = myGame.takeFromDeck(cardsOnHand.length, room.deck);
+    cardsOnHand.push(...cardsToDeal);
+    
+    room.turn = room.skipMove();
+}
+
+const clickDiscard = (data) => {
+    const room = rooms[data.roomId];
+    const client = clients[data.clientId];
+    room.cardsInPlay = [];
+   
+    const cardsOnHandAttacker = client.cardsOnHand;
+    const cardsToDealAttacker = myGame.takeFromDeck(cardsOnHandAttacker.length, room.deck);
+    cardsOnHandAttacker.push(...cardsToDealAttacker);
+  
+    const cardsOnHandDefender = clients[room.getNextTurn()].cardsOnHand;
+    const cardsToDealDefender = myGame.takeFromDeck(cardsOnHandDefender.length, room.deck);
+    cardsOnHandDefender.push(...cardsToDealDefender);
+
+    room.turn = room.getNextTurn();
+}
+
+const handlers = {
+    'createRoom': createRoom,
+    'joinRoom': joinRoom,
+    'makeMove': makeMove,
+    'clickTake': clickTake,
+    'clickDiscard': clickDiscard
+};
 
 // additional functions
 

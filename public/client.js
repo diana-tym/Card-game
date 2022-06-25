@@ -72,6 +72,33 @@ const makeMove = (event) => {
     socket.send(JSON.stringify(payLoad));
 }
 
+const clickTake = () => {
+    if (turn !== clientId || moveType !== 'defendMove') {
+        return;
+    }
+    console.log(`clicked take`);
+    const payLoad = {
+        event: 'clickTake',
+        clientId: clientId,
+        roomId: roomId
+    }
+    socket.send(JSON.stringify(payLoad));
+}
+
+const clickDiscard = () => {
+    if (turn !== clientId || moveType !== 'notFirstMove') {
+        return;
+    }
+    console.log(`clicked discard`);
+
+    const payLoad = {
+        event: 'clickDiscard',
+        clientId: clientId,
+        roomId: roomId
+    }
+    socket.send(JSON.stringify(payLoad));
+}
+
 // handlers
 
 const toConnect = (data) => {
@@ -127,6 +154,14 @@ const startGame = (data) => {
 
     turn = data.turn;
     moveType = 'firstMove';
+
+    gameDocElements.takeButton = addElement('button', 'button-take', gameDocElements.cardsDiv);
+    gameDocElements.discardButton = addElement('button', 'button-discard', gameDocElements.cardsDiv);
+    gameDocElements.takeButton.innerHTML = 'Take';
+    gameDocElements.discardButton.innerHTML = 'Discard';
+
+    gameDocElements.takeButton.addEventListener('click', clickTake);
+    gameDocElements.discardButton.addEventListener('click', clickDiscard);
     gameDocElements.cardsOnHandDiv.addEventListener('click', makeMove);
 }
 
