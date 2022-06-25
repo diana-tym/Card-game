@@ -115,7 +115,7 @@ const startGame = (room) => {
 
     room.inPlay = Array.from(room.players);
     room.turn = room.inPlay[0];
-    room.scoresInPlay = [];
+    room.cardsInPlay = [];
 
     room.getNextTurn = function() {
         let idx = this.inPlay.indexOf(this.turn) + 1;
@@ -224,7 +224,7 @@ const makeMove = (data) => {
         const defender = room.getNextTurn();
         client.cardsOnHand = cardsOnHand.filter(item => item !== card);
         room.attackCard = card;
-        room.scoresInPlay.push( myGame.getScore(card) );
+        room.cardsInPlay.push(card);
         const payLoad = {
             event: 'moveMade',
             moveType: 'defendMove',
@@ -232,14 +232,13 @@ const makeMove = (data) => {
             card: card
         }
         sendAll(room, payLoad);
-        return;
 
     } else if (data.moveType === 'defendMove') {
         const isAllowed = myGame.checkDefendMove(card, room.attackCard, room.trumpSuit);
         console.log(`isAllowed = ${isAllowed}`);
 
         if (isAllowed) {
-            room.scoresInPlay.push( myGame.getScore(card) );
+            room.cardsInPlay.push(card);
             const payLoad = {
                 event: 'moveMade',
                 moveType: 'notFirstMove',
@@ -248,11 +247,21 @@ const makeMove = (data) => {
             }
             sendAll(room, payLoad);
         }
-        return;
-      
         
     } else {   // not first move
-        return;
+        const isAllowed = myGame.checkAttackMove(card, room.cardsInPlay);
+        
+        if (isAllowed) {
+            const defender = room.getNextTurn();
+            room.cardsInPlay.push(card);
+            const payLoad = {
+                event: 'moveMade',
+                moveType: 'defendMove',
+                turn: defender,
+                card: card
+            }
+            sendAll(room, payLoad);
+        }
     }
 }
 

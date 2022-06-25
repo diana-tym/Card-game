@@ -103,5 +103,20 @@ const checkDefendMove = (card, attackCard, trumpSuit) => {
     return result;
 }
 
+const checkAttackMove = (card, cardsInPlay) => {
+    const cardScore = getScore(card);
+    let result = false;
+
+    for (const cardInPlay of cardsInPlay) {
+        const cardInPlayScore = getScore(cardInPlay);
+
+        if (cardScore === cardInPlayScore) {
+            result = true;
+            return result;
+        }
+    }
+    return result;
+}
+
 export { createDeck, shuffleDeck, dealCards, getSuit, findPosition, cardWidth, cardHeight,
-    findX, getScore, checkDefendMove }
+    findX, getScore, checkDefendMove, checkAttackMove }
