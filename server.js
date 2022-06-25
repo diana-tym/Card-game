@@ -243,6 +243,7 @@ const makeMove = (data) => {
         console.log(`isAllowed = ${isAllowed}`);
 
         if (isAllowed) {
+            client.cardsOnHand = cardsOnHand.filter(item => item !== card);
             room.cardsInPlay.push(card);
             const payLoad = {
                 event: 'moveMade',
@@ -257,6 +258,8 @@ const makeMove = (data) => {
         const isAllowed = myGame.checkAttackMove(card, room.cardsInPlay);
         
         if (isAllowed) {
+            room.attackCard = card;
+            client.cardsOnHand = cardsOnHand.filter(item => item !== card);
             const defender = room.getNextTurn();
             room.cardsInPlay.push(card);
             const payLoad = {
