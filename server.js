@@ -144,6 +144,20 @@ const startGame = (room) => {
     }
 }
 
+const checkGameOver = (room) => {
+    const inPlay = room.inPlay;
+
+    switch(inPlay.length) {
+        case 0:
+            sendAll(room, { event: 'draw' });
+            break;
+        case 1:
+            const clientId = inPlay.pop();
+            const playerName = clients[clientId].playerName;
+            sendAll(room, { event: 'lose', playerName: playerName });
+    }
+}
+
 // handlers
 
 const createRoom = (data) => {
@@ -283,11 +297,7 @@ const clickTake = (data) => {
 
     client.cardsOnHand.push(...cardsToTake);
     room.cardsInPlay = [];
-
-    const cardsOnHand = clients[attacker].cardsOnHand;
-    const cardsToDeal = myGame.takeFromDeck(cardsOnHand.length, room.deck);
-    clients[attacker].cardsOnHand.push(...cardsToDeal);
-    
+    const cardsToDeal = takeCards(room, attacker);
     room.turn = room.skipMove();
     sendNewCards(room, cardsToDeal, cardsToTake, attacker, defender);
 }
@@ -296,17 +306,11 @@ const clickDiscard = (data) => {
     const room = rooms[data.roomId];
     const attacker = data.clientId;
     const defender = room.getNextTurn();
-    const client = clients[attacker];
     room.cardsInPlay = [];
 
-    const cardsOnHandAttacker = client.cardsOnHand;
-    const cardsToDealAttacker = myGame.takeFromDeck(cardsOnHandAttacker.length, room.deck);
-    client.cardsOnHand.push(...cardsToDealAttacker);
-   
-    const cardsOnHandDefender = clients[defender].cardsOnHand;
-    const cardsToDealDefender = myGame.takeFromDeck(cardsOnHandDefender.length, room.deck);
-    clients[defender].cardsOnHand.push(...cardsToDealDefender);
-
+    const cardsToDealAttacker = takeCards(room, attacker);
+    const cardsToDealDefender = takeCards(room, defender);
+ 
     room.turn = defender;
     sendNewCards(room, cardsToDealAttacker, cardsToDealDefender, attacker, defender);
 }
@@ -379,3 +383,28 @@ const sendNewCards = (room, attackerCards, defenderCards, attacker, defender) =>
     }
 }
 
+const checkNoCards = (room, clientId) => {
+    let result = false;
+    const numberOfCardsOnHand = clients[clientId].cardsOnHand.length;
+    const numberOfCardsInDeck = room.deck.length;
+
+    if (numberOfCardsOnHand === 0 && numberOfCardsInDeck === 0) {
+        room.inPlay = room.inPlay.filter(id => id !== clientId);
+        result = true;
+    }
+    checkGameOver(room);
+    return result;
+}
+
+const takeCards = (room, clientId) => {
+    const client = clients[clientId];
+    let cardsToDeal = [];
+
+    const isPlayerLeftGame = checkNoCards(room, clientId);
+    if (!isPlayerLeftGame) {
+        const cardsOnHand = client.cardsOnHand;
+        cardsToDeal = myGame.takeFromDeck(cardsOnHand.length, room.deck);
+        client.cardsOnHand.push(...cardsToDeal);
+    }
+    return cardsToDeal;
+}

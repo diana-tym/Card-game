@@ -193,6 +193,17 @@ const newRound = (data) => {
     }
 }
 
+const lose = (data) => {
+    const name = data.playerName;
+    gameDocElements.loseDiv = addElement('div', 'game-over', main);
+    writeMsg(gameDocElements.loseDiv, `Player ${name} lost! Game over!`);
+}
+
+const draw = (data) => {
+    gameDocElements.drawDiv = addElement('div', 'game-over', main);
+    writeMsg(gameDocElements.loseDiv, `Tie! Game over!`);
+}
+
 const handlers = {
     'connect': toConnect,
     'roomCreated': roomCreated,
@@ -203,6 +214,8 @@ const handlers = {
     'startGame': startGame,
     'moveMade': getMove,
     'newRound': newRound,
+    'lose': lose,
+    'draw': draw
 };
 
 // additional funstions for game
