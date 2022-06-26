@@ -9,7 +9,7 @@ const btnJoinRoom = document.getElementById('btnJoinRoom');
 const txtPlayerName = document.getElementById('txtPlayerName');
 const txtRoomId = document.getElementById('txtRoomId');
 
-let turn = false;
+let turn;
 let moveType;
 let clickedCard;
 let clientId, roomId;
@@ -180,6 +180,19 @@ const getMove = (data) => {
     moveType = data.moveType;
 }
 
+const newRound = (data) => {
+    turn = data.turn;
+    moveType = data.moveType;
+
+    clearDiv(gameDocElements.cardsGameDiv);
+
+    if (data.hasOwnProperty('newCards')) {
+        for (const card of data.newCards) {
+            drawCardsOnHand(card);
+        }
+    }
+}
+
 const handlers = {
     'connect': toConnect,
     'roomCreated': roomCreated,
@@ -189,6 +202,7 @@ const handlers = {
     'disconnect': broadcastMsg,
     'startGame': startGame,
     'moveMade': getMove,
+    'newRound': newRound,
 };
 
 // additional funstions for game

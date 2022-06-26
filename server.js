@@ -275,33 +275,40 @@ const makeMove = (data) => {
 
 const clickTake = (data) => {
     const room = rooms[data.roomId];
-    const client = clients[data.clientId];
+    const attacker = room.turn;
+    const defender = data.clientId;
+
+    const client = clients[defender];
     const cardsToTake = room.cardsInPlay;
 
     client.cardsOnHand.push(...cardsToTake);
     room.cardsInPlay = [];
 
-    const cardsOnHand = clients[room.turn].cardsOnHand;
+    const cardsOnHand = clients[attacker].cardsOnHand;
     const cardsToDeal = myGame.takeFromDeck(cardsOnHand.length, room.deck);
-    cardsOnHand.push(...cardsToDeal);
+    clients[attacker].cardsOnHand.push(...cardsToDeal);
     
     room.turn = room.skipMove();
+    sendNewCards(room, cardsToDeal, cardsToTake, attacker, defender);
 }
 
 const clickDiscard = (data) => {
     const room = rooms[data.roomId];
-    const client = clients[data.clientId];
+    const attacker = data.clientId;
+    const defender = room.getNextTurn();
+    const client = clients[attacker];
     room.cardsInPlay = [];
-   
+
     const cardsOnHandAttacker = client.cardsOnHand;
     const cardsToDealAttacker = myGame.takeFromDeck(cardsOnHandAttacker.length, room.deck);
-    cardsOnHandAttacker.push(...cardsToDealAttacker);
-  
-    const cardsOnHandDefender = clients[room.getNextTurn()].cardsOnHand;
+    client.cardsOnHand.push(...cardsToDealAttacker);
+   
+    const cardsOnHandDefender = clients[defender].cardsOnHand;
     const cardsToDealDefender = myGame.takeFromDeck(cardsOnHandDefender.length, room.deck);
-    cardsOnHandDefender.push(...cardsToDealDefender);
+    clients[defender].cardsOnHand.push(...cardsToDealDefender);
 
-    room.turn = room.getNextTurn();
+    room.turn = defender;
+    sendNewCards(room, cardsToDealAttacker, cardsToDealDefender, attacker, defender);
 }
 
 const handlers = {
@@ -347,5 +354,28 @@ const startCountdown = (room) => {
     }
 }
 
+const sendNewCards = (room, attackerCards, defenderCards, attacker, defender) => {
+    let newCards;
+    const payLoad = {
+        event: 'newRound',
+        turn: room.turn,
+        moveType: 'firstMove'
+    };
 
+    for (const clientId of room.players) {
+        const client = clients[clientId].connection;
+        switch (clientId) {
+            case attacker:
+                newCards = { newCards: attackerCards };
+                client.send(JSON.stringify({ ...payLoad, ...newCards }));
+                break;
+            case defender: 
+                newCards = { newCards: defenderCards };
+                client.send(JSON.stringify({ ...payLoad, ...newCards }));
+                break;
+            default:
+                client.send(JSON.stringify(payLoad));
+        }
+    }
+}
 
