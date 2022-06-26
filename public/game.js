@@ -98,6 +98,7 @@ const checkDefendMove = (card, attackCard, trumpSuit) => {
 
     const isTrumpCard = cardSuit === trumpSuit;
     const isBigger = cardScore > attackCardScore;
+    const sameSuit = cardSuit === attackCardSuit;
 
     console.log(`cardScore = ${cardScore}, cardSuit = ${cardSuit}`);
     console.log(`attackCardScore = ${attackCardScore}, attackCardSuit = ${attackCardSuit}`);
@@ -110,7 +111,7 @@ const checkDefendMove = (card, attackCard, trumpSuit) => {
             result = true;
         }
     } else {
-        if (isTrumpCard || isBigger) {
+        if (isTrumpCard || (isBigger && sameSuit)) {
             result = true;
         }
     }
