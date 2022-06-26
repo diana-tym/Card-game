@@ -19,13 +19,12 @@ const gameDocElements = {};
 socket.onmessage = message => {
     const data = JSON.parse(message.data);
     const handler = handlers[data.event];
-    if (handler !== null) handler(data);
+    handler(data);
 }
 
 // client events
 
 const createRoom = () => {
-    console.log('event create room');
     const payLoad = {
         event: 'createRoom',
         clientId
@@ -35,7 +34,6 @@ const createRoom = () => {
 
 const joinRoom = () => {
     const playerName = txtPlayerName.value || 'Player';
-    console.log('playerName ' + playerName);
 
     const roomId = +txtRoomId.value;
 
@@ -43,7 +41,6 @@ const joinRoom = () => {
         const msg = 'Wrong room id!';
         writeMsg(output, msg);
     } else {
-        console.log(`Your inpur is ${roomId}`);
         const payLoad = {
             event: 'joinRoom',
             clientId: clientId,
@@ -59,7 +56,6 @@ btnJoinRoom.addEventListener('click', joinRoom);
 
 const makeMove = (event) => {
     clickedCard = +event.target.id;
-    console.log(`clicked card ${clickedCard}`);
     if ((turn !== clientId) || isNaN(clickedCard)) return;
 
     const payLoad = {
@@ -76,7 +72,6 @@ const clickTake = () => {
     if (turn !== clientId || moveType !== 'defendMove') {
         return;
     }
-    console.log(`clicked take`);
     const payLoad = {
         event: 'clickTake',
         clientId: clientId,
@@ -89,7 +84,6 @@ const clickDiscard = () => {
     if (turn !== clientId || moveType !== 'notFirstMove') {
         return;
     }
-    console.log(`clicked discard`);
 
     const payLoad = {
         event: 'clickDiscard',
@@ -103,7 +97,6 @@ const clickDiscard = () => {
 
 const toConnect = (data) => {
     clientId = data.clientId;
-    console.log(`ClientId is set ${clientId}`);
 }
 
 const roomCreated = (data) => {
@@ -147,8 +140,6 @@ const disconnect = (data) => {
 }
 
 const startGame = (data) => {
-    console.log('client: start game');
-    console.dir(data);
     clearDiv(gameDocElements.countdownDiv);
     drawDeck();
     drawTrumpCard(data.trumpCard);
@@ -171,12 +162,9 @@ const startGame = (data) => {
 }
 
 const getMove = (data) => {
-    console.log('data from showMove');
-    console.dir(data);
-    
     const card = data.card;
     drawOnBoard(card);
-    console.log(`trying to remove => turn = ${turn} === clientId = ${clientId}`);
+
     if (turn === clientId) {
         document.getElementById(card).remove();
     }

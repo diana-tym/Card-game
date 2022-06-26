@@ -4,10 +4,6 @@
     margin: 10px;
 }
 
-#main {
-    margin: 0 auto;
-}
-
 #input {
     text-align: center;
     border: thick double #cece32;
@@ -21,28 +17,18 @@ body {
     background-color: antiquewhite;
 }
 
-#countdown {
-    background-color: aqua;
-}
-
-#player-connection {
-    background-color: blueviolet;
-}
-
 #cards {
-    width: 1300px; /* width of container */
-    height: 800px; /* height of container */
-    border: 5px solid black;
+    width: 1300px;
+    height: 800px;
     position: relative;
 }
 
 canvas {
-    border: 2px solid rgb(199, 38, 97);
+    border: 2px solid black;
     border-radius: 15%;
 }
 
 #deck {
-    background-color: coral;
     position: absolute;
     right: 20px;
     top: 50px;
@@ -50,24 +36,20 @@ canvas {
 }
 
 .trump-card {
-    background-color: deeppink;
     position: absolute;
     top: 50px;
     right: 100px;
     z-index: 0;
 }
 #on-hand {
-    border: 5px solid rgb(27, 198, 153);
     width: 1300px;
     height: 210px;
     position: absolute;
     bottom: 20px;
-    /*display: flex;*/
 }
 
 #on-hand canvas {
     display: inline-block;  
-    background-color: blueviolet;
 }
 
 #game {

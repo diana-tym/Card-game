@@ -94,19 +94,16 @@ socket.on('request', req => {
 
 const startGame = (room) => {
     if (room.players.length < minPlayers) {
-        console.log('less than 2 players');
         return;
     }
 
     const deck = myGame.createDeck();
     room.deck = myGame.shuffleDeck(deck);
-    console.log(`deck: ${room.deck}`);
 
     for (const clientId of room.players) {
         const player = clients[clientId];
         player.cardsOnHand = myGame.dealCards(room.deck);
     }
-    //myGame.dealCards(room.players, clients, room.deck);
 
     const trumpCard = room.deck.pop();
     room.trumpCard = trumpCard
@@ -254,7 +251,6 @@ const makeMove = (data) => {
 
     } else if (data.moveType === 'defendMove') {
         const isAllowed = myGame.checkDefendMove(card, room.attackCard, room.trumpSuit);
-        console.log(`isAllowed = ${isAllowed}`);
 
         if (isAllowed) {
             client.cardsOnHand = cardsOnHand.filter(item => item !== card);
@@ -341,7 +337,6 @@ const generateId = () => Math.floor(Math.random() * 10000) + 1;
 const sendAll = (room, payLoad) => {
     for (const clientId of room.players) {
         const client = clients[clientId].connection;
-        console.dir(payLoad);
         client.send(JSON.stringify(payLoad));
     }
 }
@@ -353,7 +348,6 @@ const startCountdown = (room) => {
 
     if (waitingTime <= 0) {
         clearInterval(room.countdown);
-        console.log('start game');
         startGame(room);
     }
 }

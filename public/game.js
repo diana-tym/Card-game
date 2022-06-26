@@ -28,17 +28,6 @@ const shuffleDeck = (deck) => {
     return newDeck;
 }
 
-// const dealCards = (players, clients, deck) => {
-//     for (const clientId of players) {
-//         const player = clients[clientId];
-//         const cardsToDeal = deck.splice(deck.length - numOfCardsToDeal, numOfCardsToDeal);
-//         player.cardsAtHand = cardsToDeal;
-//         console.log(`client: ${clientId}, deck: ${cardsToDeal}`);
-
-//     }
-//     console.log('------------');
-// }
-
 const useDeck = (numOfCardsToDeal, deck) => {
     const cardsToDeal = deck.splice(deck.length - numOfCardsToDeal, numOfCardsToDeal);
     return cardsToDeal;
@@ -99,10 +88,6 @@ const checkDefendMove = (card, attackCard, trumpSuit) => {
     const isTrumpCard = cardSuit === trumpSuit;
     const isBigger = cardScore > attackCardScore;
     const sameSuit = cardSuit === attackCardSuit;
-
-    console.log(`cardScore = ${cardScore}, cardSuit = ${cardSuit}`);
-    console.log(`attackCardScore = ${attackCardScore}, attackCardSuit = ${attackCardSuit}`);
-    console.log(`isTrumpCard = ${isTrumpCard}, isBigger = ${isBigger}`);
 
     let result = false;
 
