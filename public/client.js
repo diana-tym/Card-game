@@ -142,9 +142,14 @@ const broadcastMsg = (msg) => {
     }, 3000);
 }
 
+const disconnect = (data) => {
+    broadcastMsg(data.msg);
+}
+
 const startGame = (data) => {
     console.log('client: start game');
     console.dir(data);
+    clearDiv(gameDocElements.countdownDiv);
     drawDeck();
     drawTrumpCard(data.trumpCard);
 
@@ -210,7 +215,7 @@ const handlers = {
     'error': showError,
     'joinedRoom': joinedRoom,
     'countdown': countdown,
-    'disconnect': broadcastMsg,
+    'disconnect': disconnect,
     'startGame': startGame,
     'moveMade': getMove,
     'newRound': newRound,
