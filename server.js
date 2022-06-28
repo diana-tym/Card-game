@@ -1,14 +1,13 @@
 import * as myGame from './public/game.js';
+import { port } from './config.js';
 import { readFile } from 'fs';
 import { createServer } from 'http';
 import { server as Websocket } from 'websocket';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const dirName = dirname(fileURLToPath(import.meta.url));
 
-const baseDir = __dirname + '/public';
-const port = 8000;
 const NOT_FOUND_CODE = 400;
 const OK_CODE = 200;
 
@@ -22,18 +21,15 @@ const rooms = {};
 
 const mimeTypes = {
     'html': 'text/html',
-    'jgp': 'image/jpeg',
     'css': 'text/css',
     'js': 'text/javascript',
     'png': 'image/png',
-    'svg': 'image/svg+xml',
 };
 
 const httpServer = createServer((req, res) => {
-    let path = req.url;
-    if (path === '/') path = '/index.html';
+    const path = req.url;
+    const absPath = getAbsPath(path);
     const contentType = getContentType(path);
-    const absPath = baseDir + path;
 
     readFile(absPath, (err, data) => {
         if (err) {
@@ -77,7 +73,7 @@ socket.on('request', req => {
         if (typeof roomId !== 'undefined') {
             const players = room.players;
             room.players = players.filter(id => id !== clientId);
-            sendAll(room, { event: 'disconnect', msg: `${playerName} has left the room!` });
+            sendAll(room, { event: 'disconnect', playerName: playerName });
             if (room.players.length === 0) {
                 delete rooms[roomId];
             }
@@ -213,7 +209,7 @@ const joinRoom = (data) => {
                 event: 'joinedRoom',
                 clientId: clientId,
                 roomId: data.roomId,
-                msg: `${data.playerName} has joined the room!`
+                playerName: data.playerName
             };
 
             sendAll(room, payLoad);
@@ -401,4 +397,20 @@ const takeCards = (room, clientId) => {
         client.cardsOnHand.push(...cardsToDeal);
     }
     return cardsToDeal;
+}
+
+
+const getAbsPath = (path) => {
+    let absPath;
+    switch (path) {
+        case '/': 
+            absPath = dirName + '/public/index.html'; 
+            break;
+        case '/config.js': 
+            absPath = dirName + path; 
+            break;
+        default: 
+            absPath = dirName + '/public' + path;
+    }
+    return absPath;
 }

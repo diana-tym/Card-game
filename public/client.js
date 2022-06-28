@@ -1,6 +1,7 @@
 import { cardWidth, cardHeight, findPosition, findX } from './game.js';
+import { clientUrl } from '../config.js';
 
-const socket = new WebSocket('ws://localhost:8000');
+const socket = new WebSocket(`ws://${clientUrl}`);
 
 const main = document.getElementById('main');
 const output = document.getElementById('output');
@@ -11,7 +12,6 @@ const txtRoomId = document.getElementById('txtRoomId');
 
 let turn;
 let moveType;
-let clickedCard;
 let clientId, roomId;
 let drawCardsOnHand, drawTrumpCard, drawOnBoard;
 const gameDocElements = {};
@@ -55,7 +55,7 @@ btnNewRoom.addEventListener('click', createRoom);
 btnJoinRoom.addEventListener('click', joinRoom);
 
 const makeMove = (event) => {
-    clickedCard = +event.target.id;
+    const clickedCard = +event.target.id;
     if ((turn !== clientId) || isNaN(clickedCard)) return;
 
     const payLoad = {
@@ -110,7 +110,8 @@ const joinedRoom = (data) => {
         setUpRoom();
     }
     roomId = data.roomId;
-    broadcastMsg(data.msg);
+    const msg = `${data.playerName} has joined the room!`;
+    broadcastMsg(msg);
 }
 
 const showError = (data) => {
@@ -136,7 +137,8 @@ const broadcastMsg = (msg) => {
 }
 
 const disconnect = (data) => {
-    broadcastMsg(data.msg);
+    const msg = `${data.playerName} has left the room!`;
+    broadcastMsg(msg);
 }
 
 const startGame = (data) => {
